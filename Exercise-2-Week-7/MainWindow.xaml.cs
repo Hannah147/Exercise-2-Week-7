@@ -20,14 +20,36 @@ namespace Exercise_2_Week_7
     /// </summary>
     public partial class MainWindow : Window
     {
+        AdventureLiteEntities db = new AdventureLiteEntities();
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var query = from o in db.SalesOrderHeaders
+                        orderby o.Customer.CompanyName
+                        select o.Customer.CompanyName;
+
+            var result = query.ToList();
+
+            lbxCustomers.ItemsSource = query.ToList().Distinct();
+        }
+
         private void LbxCustomers_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            string customer = lbxCustomers.SelectedItem as string;
 
+            if(customer != null)
+            {
+                var query = from o in db.SalesOrderHeaders
+                            where o.Customer.CompanyName.Equals(customer)
+                            select o;
+
+                lbxOrders.ItemsSource = query.ToList();
+            }
         }
 
         private void LbxOrders_SelectionChanged(object sender, SelectionChangedEventArgs e)
